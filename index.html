@@ -59,7 +59,7 @@
                 <div class="alert alert-warning none" id="protocolAlert">
                     <p>تنها پروتکل‌های VLESS و TROJAN پشتیبانی می‌شوند.</p>
                 </div>
-                <input class="form-control dirLeft" placeholder="Vless/Trojan config" id="defConfig" />
+                <input class="form-control dirLeft" placeholder="Vless, Vmess or Trojan" id="defConfig" />
                 <textarea class="form-control dirLeft" id="pastedList" placeholder="1.1.1.1"></textarea>
                 <div class="input-group fetchIps">
                     <select class="form-control" id="provider">
@@ -169,7 +169,7 @@
                     </div>
                     <script src="./assets/js/jquery.min.js"></script>
                     <script src="./assets/js/bootstrap.min.js"></script>
-                    <script src="./assets/js/script.js?v1.0.2"></script>
+                    <script src="./assets/js/script.js?v1.1"></script>
                     <script>
                         window.addEventListener('load', function() {
                             let yourConfig = localStorage.getItem("defConfig");
