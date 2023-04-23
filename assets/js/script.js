@@ -91,7 +91,11 @@ $(document).on('keyup', '#defConfig', function(e) {
         $('#protocolAlert').removeClass('none');
         return false;
     }
-    $('#protocolAlert').addClass('none');
+    if ( countConfigs(config) > 1 ) {
+        $('#configAlert').removeClass('none');
+        return false;
+    }
+    $('#protocolAlert, #configAlert').addClass('none');
     $('#pastedList').trigger('keyup');
 
 });
@@ -277,4 +281,25 @@ function translateDigits(string, to) {
 
 function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+function countConfigs(str) {
+    const strWithoutSpace = str.toLowerCase().replace(/\s/g, "");
+    let totalConfig = 0;
+    for (let i = 0; i < strWithoutSpace.length; i++) {
+        const char = strWithoutSpace[i];
+        if (char === "v" && strWithoutSpace.slice(i, i + 8) === "vless://") {
+            totalConfig++;
+            i += 4;
+        }
+        else if (char === "v" && strWithoutSpace.slice(i, i + 8) === "vmess://") {
+            totalConfig++;
+            i += 4;
+        }
+        else if (char === "t" && strWithoutSpace.slice(i, i + 9) === "trojan://") {
+            totalConfig++;
+            i += 4;
+        }
+    }
+    return totalConfig;
 }
