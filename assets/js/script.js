@@ -52,14 +52,14 @@ function updateConfig(ip) {
     if ( getProtocol(pastedConfig) === 'vmess' ) {
         let oldConf = base64Decode(pastedConfig);
         oldConf.add = ip;
-        oldConf.ps = oldConf.ps+(provider !== "" ? "_"+provider.toUpperCase() : "");
+        oldConf.ps = oldConf.ps+(provider !== "" ? "_"+provider.toUpperCase() : "")+"_IRCF";
         let newConf = base64Encode(oldConf);
         return 'vmess://'+newConf;
     }
     else {
         let findIp = findDefIp(pastedConfig);
         pastedConfig = pastedConfig.replace(findIp, ip);
-        return pastedConfig+(provider !== "" ? "_"+provider.toUpperCase() : "");
+        return pastedConfig+(provider !== "" ? "_"+provider.toUpperCase() : "")+"_IRCF";
     }
 }
 
