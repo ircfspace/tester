@@ -98,7 +98,7 @@ $(document).on('keyup', '#defConfig', function(e) {
     let config = $(this).val();
     localStorage.setItem("defConfig", config);
     let protocol = getProtocol(config);
-    if ( ! protocols.includes(protocol) ) {
+    if ( config !== "" && config.length > 10 && ! protocols.includes(protocol) ) {
         $('#protocolAlert').removeClass('none');
         $('#pastedList').trigger('keyup');
         return false;
@@ -128,11 +128,13 @@ $(document).on('keyup', '#pastedList', function(e) {
     let protocol = getProtocol(defConf);
     if ( ! protocols.includes(protocol) ) {
         hasDefConf = false;
-        $('#list').html('').addClass('none');
+        $('#list').addClass('none');
+        $('#list textarea').html('');
     }
     if ( defConf.length < 25 ) {
         hasDefConf = false;
-        $('#list').html('').addClass('none');
+        $('#list').addClass('none');
+        $('#list textarea').html('');
     }
     if ( list !== '' ) {
         list = list.split("\n");
@@ -181,7 +183,8 @@ $(document).on('keyup', '#pastedList', function(e) {
             }
             $('#result').html(html);
             if ( hasDefConf ) {
-                $('#list').html(code.slice(0, -1)).removeClass('none');
+                $('#list').removeClass('none');
+                $('#list textarea').html(code.slice(0, -1));
             }
         }
     }
