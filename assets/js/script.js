@@ -41,14 +41,25 @@ function findDefIp(pastedConfig) {
     if ( pastedConfig === '' ) {
         return false;
     }
-    let config = pastedConfig.split("@");
-    config = config[1].split(":");
-    return config[0];
+    try {
+        let config = pastedConfig.split("@");
+        config = config[1].split(":");
+        return config[0];
+    }
+    catch {
+        return "";
+    }
 }
 
 function updateConfig(ip) {
     let pastedConfig = $('#defConfig').val();
     let provider = $('#provider').val();
+    if ( pastedConfig === '' ) {
+        return false;
+    }
+    if ( countConfigs(pastedConfig) > 1 ) {
+        return false;
+    }
     if ( getProtocol(pastedConfig) === 'vmess' ) {
         let oldConf = base64Decode(pastedConfig);
         oldConf.add = ip;
@@ -89,6 +100,7 @@ $(document).on('keyup', '#defConfig', function(e) {
     let protocol = getProtocol(config);
     if ( ! protocols.includes(protocol) ) {
         $('#protocolAlert').removeClass('none');
+        $('#pastedList').trigger('keyup');
         return false;
     }
     if ( countConfigs(config) > 1 ) {
@@ -108,41 +120,58 @@ $(document).on('change', '#provider', function(e) {
 $(document).on('keyup', '#pastedList', function(e) {
     e.preventDefault();
     let list = $(this).val();
+    let defConf = $('#defConfig').val();
     let html = '';
     let code = '';
     let validIp = 1;
-    if ( $('#defConfig').val() === '' ) {
-        return false;
+    let hasDefConf = ( defConf === '' ? false : true );
+    let protocol = getProtocol(defConf);
+    if ( ! protocols.includes(protocol) ) {
+        hasDefConf = false;
+        $('#list').html('').addClass('none');
+    }
+    if ( defConf.length < 25 ) {
+        hasDefConf = false;
+        $('#list').html('').addClass('none');
     }
     if ( list !== '' ) {
         list = list.split("\n");
         if ( list.length > 0 ) {
             list = uniqueArray(list);
-            for (let i=0; i<list.length; i++){
+            for (let i=0; i<list.length; i++) {
                 let vl = list[i];
                 vl = findIpInString(vl);
                 try {
                     vl = vl.trim();
-                }
-                catch(err) {
+                } catch (err) {
                     //location.reload();
                 }
-                if (vl === "") { continue; }
-                if (typeof vl === "null") { continue; }
-                if (!isValidIp(vl)) { continue; }
+                if (vl === "") {
+                    continue;
+                }
+                if (typeof vl === "null") {
+                    continue;
+                }
+                if (!isValidIp(vl)) {
+                    continue;
+                }
                 let newConf = updateConfig(vl);
-                code += newConf+"\n";
+                if ( hasDefConf ) {
+                    code += newConf + "\n";
+                }
                 html += '<tr>';
                 html += '<td>';
                 html += translateDigits(validIp);
                 html += '</td>';
-                html += "<td onclick='copyToClipboard(\""+vl+"\", \"\");'>";
+                html += "<td onclick='copyToClipboard(\"" + vl + "\", \"\");'>";
                 html += vl;
                 html += '</td>';
                 html += '<td>';
-                html += "<a href='javascript:;' onclick='dnsTest(\""+vl+"\", \"\");' class='label label-info'><small>پینگ</small></a> ";
-                html += " <a href='https://quickchart.io/qr?size=300x200&light=ffffff&text="+encodeURIComponent(newConf)+"' class='label label-primary' target='_blank'><small>کد QR</small></a> ";
-                html += " <a href='javascript:;' onclick='copyToClipboard(\""+newConf+"\", \""+vl+"\");' class='label label-success' data-ipt='"+vl+"'><small>کپی کانفیگ</small></a> ";
+                html += "<a href='javascript:;' onclick='dnsTest(\"" + vl + "\", \"\");' class='label label-info'><small>پینگ</small></a> ";
+                if ( hasDefConf ) {
+                    html += " <a href='https://quickchart.io/qr?size=300x200&light=ffffff&text=" + encodeURIComponent(newConf) + "' class='label label-primary' target='_blank'><small>کد QR</small></a> ";
+                    html += " <a href='javascript:;' onclick='copyToClipboard(\"" + newConf + "\", \"" + vl + "\");' class='label label-success' data-ipt='" + vl + "'><small>کپی کانفیگ</small></a> ";
+                }
                 html += '</td>';
                 html += '</tr>';
                 if ( validIp < 2 ) {
@@ -151,7 +180,9 @@ $(document).on('keyup', '#pastedList', function(e) {
                 validIp++;
             }
             $('#result').html(html);
-            $('#list').html(code.slice(0, -1));
+            if ( hasDefConf ) {
+                $('#list').html(code.slice(0, -1)).removeClass('none');
+            }
         }
     }
     else {
