@@ -207,6 +207,7 @@ $(document).on('click', '#fetchFromOther', function(e) {
         $('#provider').focus();
         return;
     }
+    $('#fetchFromOther').html('درحال دریافت ...');
     let inArr = [ provider ];
     if ( provider === 'irc' || provider === 'mtn' ) {
         inArr = [ "irc", "mtn" ];
@@ -230,9 +231,12 @@ $(document).on('click', '#fetchFromOther', function(e) {
         });
         $('#pastedList').val(ipList).trigger('keyup');
         document.getElementById('fetchFromOther').disabled = false;
-    }).fail(function() {
+        $('#fetchFromOther').html('جستجو از منابع دیگر');
+    })
+    .fail(function() {
         $('#pastedList').val('').trigger('keyup');
         document.getElementById('fetchFromOther').disabled = false;
+        $('#fetchFromOther').html('جستجو از منابع دیگر');
     });
 });
 
