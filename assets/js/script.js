@@ -139,7 +139,7 @@ function getProtocol(config) {
 
 $(document).on('click', '#fetchFromOther', function(e) {
     e.preventDefault();
-    $('#pastedList').html('').trigger('keyup');
+    $('#pastedList').val('').trigger('keyup');
     let provider = $('#provider').val();
     if ( provider === '' || typeof provider === 'undefined' ) {
         $('#provider').focus();
@@ -166,10 +166,10 @@ $(document).on('click', '#fetchFromOther', function(e) {
                 $i++;
             }
         });
-        $('#pastedList').html(ipList).trigger('keyup');
+        $('#pastedList').val(ipList).trigger('keyup');
         document.getElementById('fetchFromOther').disabled = false;
     }).fail(function() {
-        $('#pastedList').html('').trigger('keyup');
+        $('#pastedList').val('').trigger('keyup');
         document.getElementById('fetchFromOther').disabled = false;
     });
 });
