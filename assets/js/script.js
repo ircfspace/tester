@@ -1,4 +1,4 @@
-const protocols = ["vless", "trojan"];
+const protocols = ["vless", "trojan", "vmess"];
 let pregIp = /(?:^(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}$)|(?:^(?:(?:[a-fA-F\d]{1,4}:){7}(?:[a-fA-F\d]{1,4}|:)|(?:[a-fA-F\d]{1,4}:){6}(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:\\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}|:[a-fA-F\d]{1,4}|:)|(?:[a-fA-F\d]{1,4}:){5}(?::(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:\\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}|(?::[a-fA-F\d]{1,4}){1,2}|:)|(?:[a-fA-F\d]{1,4}:){4}(?:(?::[a-fA-F\d]{1,4}){0,1}:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:\\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}|(?::[a-fA-F\d]{1,4}){1,3}|:)|(?:[a-fA-F\d]{1,4}:){3}(?:(?::[a-fA-F\d]{1,4}){0,2}:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:\\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}|(?::[a-fA-F\d]{1,4}){1,4}|:)|(?:[a-fA-F\d]{1,4}:){2}(?:(?::[a-fA-F\d]{1,4}){0,3}:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:\\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}|(?::[a-fA-F\d]{1,4}){1,5}|:)|(?:[a-fA-F\d]{1,4}:){1}(?:(?::[a-fA-F\d]{1,4}){0,4}:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:\\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}|(?::[a-fA-F\d]{1,4}){1,6}|:)|(?::(?:(?::[a-fA-F\d]{1,4}){0,5}:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:\\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}|(?::[a-fA-F\d]{1,4}){1,7}|:)))(?:%[0-9a-zA-Z]{1,})?$)/gm;
 
 function isValidIp(ipaddress) {
@@ -50,10 +50,38 @@ function findDefIp(pastedConfig) {
 
 function updateConfig(ip) {
     let pastedConfig = $('#defConfig').val();
-    let findIp = findDefIp(pastedConfig);
-    pastedConfig = pastedConfig.replace(findIp, ip);
     let provider = $('#provider').val();
-    return pastedConfig+(provider !== "" ? "_"+provider.toUpperCase() : "");
+    if ( getProtocol(pastedConfig) === 'vmess' ) {
+        let oldConf = base64Decode(pastedConfig);
+        oldConf.add = ip;
+        oldConf.ps = oldConf.ps+(provider !== "" ? "_"+provider.toUpperCase() : "");
+        let newConf = base64Encode(oldConf);
+        return 'vmess://'+newConf;
+    }
+    else {
+        let findIp = findDefIp(pastedConfig);
+        pastedConfig = pastedConfig.replace(findIp, ip);
+        return pastedConfig+(provider !== "" ? "_"+provider.toUpperCase() : "");
+    }
+}
+
+function base64Decode(config) {
+    try {
+        config = config.replace("vmess://", "");
+        return JSON.parse(atob(config));
+    }
+    catch {
+        return {};
+    }
+}
+
+function base64Encode(object) {
+    try {
+        return btoa(JSON.stringify(object));
+    }
+    catch {
+        return "";
+    }
 }
 
 $(document).on('keyup', '#defConfig', function(e) {
@@ -67,6 +95,7 @@ $(document).on('keyup', '#defConfig', function(e) {
     }
     $('#protocolAlert').addClass('none');
     $('#pastedList').trigger('keyup');
+
 });
 
 $(document).on('change', '#provider', function(e) {
