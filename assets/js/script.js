@@ -166,7 +166,7 @@ $(document).on('click', '#fetchFromOther', function(e) {
                 $i++;
             }
         });
-        $('#pastedList').append(ipList).trigger('keyup');
+        $('#pastedList').html(ipList).trigger('keyup');
         document.getElementById('fetchFromOther').disabled = false;
     }).fail(function() {
         $('#pastedList').html('').trigger('keyup');
